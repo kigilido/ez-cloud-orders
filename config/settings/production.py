@@ -8,4 +8,5 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-CSRF_TRUSTED_ORIGINS = ["ez-cloud-orders-production.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ["https://ez-cloud-orders-production.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ["http://ez-cloud-orders-production.up.railway.app"]
