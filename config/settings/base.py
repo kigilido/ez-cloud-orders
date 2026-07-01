@@ -14,7 +14,17 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY", default="django-insecure-change-me-in-production")
 
-ALLOWED_HOSTS: list[str] = env.list("ALLOWED_HOSTS", default=[])
+_DEFAULT_ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "ez-cloud-orders-production.up.railway.app",
+]
+
+# Comma-separated list in ALLOWED_HOSTS env var, e.g.:
+# ALLOWED_HOSTS=example.com,.railway.app
+ALLOWED_HOSTS: list[str] = list(
+    dict.fromkeys(_DEFAULT_ALLOWED_HOSTS + env.list("ALLOWED_HOSTS", default=[]))
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
