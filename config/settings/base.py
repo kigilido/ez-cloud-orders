@@ -17,8 +17,12 @@ SECRET_KEY = env("SECRET_KEY", default="django-insecure-change-me-in-production"
 _DEFAULT_ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "ez-cloud-orders-production.up.railway.app",
 ]
+
+# Add Railway-provided domain if available
+railway_domain = env("RAILWAY_PUBLIC_DOMAIN", default=None)
+if railway_domain:
+    _DEFAULT_ALLOWED_HOSTS.append(railway_domain)
 
 # Comma-separated list in ALLOWED_HOSTS env var, e.g.:
 # ALLOWED_HOSTS=example.com,.railway.app
@@ -138,3 +142,4 @@ SHAREPOINT_REPORT_EMAIL = env("SHAREPOINT_REPORT_EMAIL", default="")
 GOOGLE_DRIVE_REPORT_EMAIL = env("GOOGLE_DRIVE_REPORT_EMAIL", default="")
 
 BILLING_DAY = env("BILLING_DAY", default="last")
+
