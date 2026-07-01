@@ -7,3 +7,5 @@ dj-database-url>=2.1
 gunicorn>=22.0
 whitenoise>=6.6
 weasyprint>=63.0
+xhtml2pdf>=0.2.15
+
