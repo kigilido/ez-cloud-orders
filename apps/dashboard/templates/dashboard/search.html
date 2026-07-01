@@ -1,0 +1,65 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Customer Search — EZ Cloud Orders{% endblock %}
+{% block page_title %}Customer Search{% endblock %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800">Customer Search</h1>
+    <p class="text-sm text-slate-500 mt-1">Look up a customer by phone number to check eligibility and create an order.</p>
+</div>
+
+<!-- Search card -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6 max-w-2xl">
+    <form method="get" action="{% url 'dashboard:search' %}">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+        <div class="flex gap-3">
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/>
+                    </svg>
+                </div>
+                <input
+                    type="tel"
+                    name="phone"
+                    value="{{ phone }}"
+                    placeholder="e.g. 845-352-0396"
+                    autofocus
+                    class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800
+                           placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                           bg-slate-50 transition"
+                >
+            </div>
+            <button type="submit"
+                class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl
+                       shadow-sm shadow-blue-200 transition-all duration-150 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                </svg>
+                Search
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Results -->
+{% if result %}
+    {% include "dashboard/customer_card.html" %}
+{% elif phone %}
+<div class="max-w-2xl bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex items-center gap-4">
+    <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+        </svg>
+    </div>
+    <div>
+        <p class="text-sm font-semibold text-slate-800">No customer found</p>
+        <p class="text-sm text-slate-500">No record matched <strong>{{ phone }}</strong>. Check the number and try again.</p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

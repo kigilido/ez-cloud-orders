@@ -1,0 +1,81 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Month-End Billing — EZ Cloud Orders{% endblock %}
+{% block page_title %}Month-End Billing{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <h1 class="text-2xl font-bold mb-2">Month-End Billing</h1>
+    <p class="text-gray-600 mb-6">
+        Period: {{ period_start|date:"M j, Y" }} — {{ period_end|date:"M j, Y" }}
+    </p>
+
+    {% if current_complete %}
+    <div class="rounded-lg border border-green-300 bg-green-50 p-4 mb-6 text-sm text-green-800">
+        Billing already completed for this period on
+        {{ current_complete.generated_at|date:"M j, Y g:i A" }}.
+        Re-running will regenerate all PDFs.
+    </div>
+    {% endif %}
+
+    <div class="rounded-lg border border-gray-200 bg-white p-6 mb-8">
+        <h2 class="font-semibold mb-3">What runs</h2>
+        <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+            <li>Generate a PDF invoice for each order in the period</li>
+            <li>Generate a consolidated month-end statement PDF</li>
+            <li>Push statement to Zoho (when configured)</li>
+            <li>Email SharePoint and Google Drive invoice reports (when configured)</li>
+        </ol>
+
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <button
+                type="submit"
+                class="rounded-lg bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700"
+            >
+                Run Month-End
+            </button>
+        </form>
+    </div>
+
+    {% if recent_statements %}
+    <h2 class="font-semibold mb-3">Recent runs</h2>
+    <div class="rounded-lg border border-gray-200 bg-white overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="text-left px-4 py-2 font-medium text-gray-600">Period</th>
+                    <th class="text-left px-4 py-2 font-medium text-gray-600">Status</th>
+                    <th class="text-left px-4 py-2 font-medium text-gray-600">Run at</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for stmt in recent_statements %}
+                <tr class="hover:bg-slate-50 cursor-pointer transition-colors"
+                    onclick="window.location='{% url 'dashboard:statement_detail' stmt.pk %}'">
+                    <td class="px-4 py-3 font-medium text-slate-800">
+                        {{ stmt.period_start|date:"M j" }} — {{ stmt.period_end|date:"M j, Y" }}
+                    </td>
+                    <td class="px-4 py-3">
+                        {% if stmt.status == "complete" %}
+                        <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">Complete</span>
+                        {% elif stmt.status == "error" %}
+                        <span class="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-full">Error</span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full">{{ stmt.status|title }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-slate-400 text-xs">
+                        {{ stmt.generated_at|date:"M j, Y g:i A" }}
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <span class="text-xs text-blue-500 font-medium">View →</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

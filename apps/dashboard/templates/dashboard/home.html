@@ -1,0 +1,148 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard — EZ Cloud Orders{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="mb-8">
+    <h2 class="text-2xl font-bold text-slate-800">{{ greeting }}, {{ request.user.username|capfirst }}</h2>
+    <p class="text-sm text-slate-500 mt-1">Here's what's happening today — {{ today|date:"F j, Y" }}</p>
+</div>
+
+<!-- Stat cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Customers in System</p>
+        <p class="text-3xl font-bold text-slate-800">{{ total_customers }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Eligible Customers</p>
+        <p class="text-3xl font-bold text-slate-800">{{ eligible_customers }}</p>
+        {% if total_customers > 0 %}
+        <p class="text-xs text-emerald-600 font-medium mt-1">{{ eligible_customers }} of {{ total_customers }} active</p>
+        {% endif %}
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Orders This Month</p>
+        <p class="text-3xl font-bold text-slate-800">{{ orders_this_month }}</p>
+        {% if orders_last_month > 0 %}
+        <p class="text-xs text-slate-500 mt-1">{{ orders_last_month }} last month</p>
+        {% endif %}
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Pending Inbound</p>
+        <p class="text-3xl font-bold text-slate-800">{{ pending_inbound }}</p>
+        {% if pending_inbound > 0 %}
+        <a href="{% url 'dashboard:search' %}" class="text-xs text-blue-600 hover:text-blue-800 font-medium mt-1 inline-block">Process now →</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+    <!-- Recent orders -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-700">Recent Orders</h3>
+            <a href="{% url 'orders:list' %}" class="text-xs font-semibold text-blue-600 hover:text-blue-800">View All →</a>
+        </div>
+
+        {% if recent_orders %}
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-slate-100 bg-slate-50">
+                    <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Customer</th>
+                    <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Source</th>
+                    <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                    <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+                {% for order in recent_orders %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-3">
+                        <p class="font-semibold text-slate-800">{{ order.customer.first_name }} {{ order.customer.last_name }}</p>
+                        <p class="text-xs text-slate-400">{{ order.customer.phone_number }}</p>
+                    </td>
+                    <td class="px-6 py-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                            {{ order.get_source_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if order.status == 'submitted' %}bg-emerald-50 text-emerald-700
+                            {% elif order.status == 'pending' %}bg-amber-50 text-amber-700
+                            {% else %}bg-slate-100 text-slate-600{% endif %}">
+                            {{ order.status|capfirst }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-3 text-xs text-slate-400">{{ order.created_at|date:"M j, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="px-6 py-14 text-center">
+            <p class="text-sm font-semibold text-slate-600">No orders yet</p>
+            <p class="text-xs text-slate-400 mt-1 mb-4">Search for a customer to create your first order.</p>
+            <a href="{% url 'dashboard:search' %}"
+               class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">
+                Go to Customer Search
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right column -->
+    <div class="flex flex-col gap-5">
+
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100">
+                <h3 class="text-sm font-bold text-slate-700">Quick Actions</h3>
+            </div>
+            <div class="p-4 space-y-2">
+                <a href="{% url 'dashboard:search' %}"
+                   class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">
+                    Search Customer
+                </a>
+                <a href="{% url 'orders:list' %}"
+                   class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors">
+                    View Orders
+                </a>
+                <a href="{% url 'dashboard:month_end' %}"
+                   class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors">
+                    Month-End Billing
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100">
+                <h3 class="text-sm font-bold text-slate-700">Connector Status</h3>
+            </div>
+            <div class="p-4 space-y-2">
+                <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <span class="w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span>
+                    <span class="text-sm font-medium text-slate-700 flex-1">Zoho</span>
+                    <span class="text-xs text-slate-400">Not configured</span>
+                </div>
+                <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <span class="w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span>
+                    <span class="text-sm font-medium text-slate-700 flex-1">SharePoint</span>
+                    <span class="text-xs text-slate-400">Not configured</span>
+                </div>
+                <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <span class="w-2 h-2 rounded-full bg-slate-300 flex-shrink-0"></span>
+                    <span class="text-sm font-medium text-slate-700 flex-1">Google Drive</span>
+                    <span class="text-xs text-slate-400">Not configured</span>
+                </div>
+                <p class="text-[10px] text-center text-slate-400 pt-1">Turns green once credentials are added.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

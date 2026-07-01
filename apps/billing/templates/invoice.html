@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice_number }}</title>
+    <style>
+        body { font-family: sans-serif; font-size: 12px; color: #111; }
+        h1 { font-size: 20px; margin-bottom: 16px; }
+        dl { display: grid; grid-template-columns: 140px 1fr; gap: 8px; }
+        dt { color: #555; }
+        .note { margin-top: 24px; color: #666; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <h1>Invoice {{ invoice_number }}</h1>
+    <dl>
+        <dt>Order</dt>
+        <dd>#{{ order.pk }}</dd>
+        <dt>Customer</dt>
+        <dd>{{ order.customer }}</dd>
+        <dt>Phone</dt>
+        <dd>{{ order.customer.phone_number }}</dd>
+        <dt>Medicaid ID</dt>
+        <dd>{{ order.customer.medicaid_id }}</dd>
+        <dt>Source</dt>
+        <dd>{{ order.get_source_display }}</dd>
+        <dt>Created</dt>
+        <dd>{{ order.created_at|date:"M j, Y g:i A" }}</dd>
+        {% if order.pos_order_id %}
+        <dt>POS ID</dt>
+        <dd>{{ order.pos_order_id }}</dd>
+        {% endif %}
+    </dl>
+    <p class="note">Billing calculation TBD — awaiting client confirmation.</p>
+</body>
+</html>

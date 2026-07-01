@@ -1,0 +1,66 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Orders — EZ Cloud Orders{% endblock %}
+{% block page_title %}Orders{% endblock %}
+
+{% block content %}
+
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800">Orders</h1>
+    <p class="text-sm text-slate-500 mt-1">All orders created this session.</p>
+</div>
+
+{% if orders %}
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="border-b border-slate-100 bg-slate-50">
+                <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">#</th>
+                <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Customer</th>
+                <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Source</th>
+                <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">POS ID</th>
+                <th class="text-left px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Created</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-50">
+            {% for order in orders %}
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-6 py-4 font-semibold text-slate-400">{{ order.pk }}</td>
+                <td class="px-6 py-4">
+                    <div class="font-semibold text-slate-800">{{ order.customer.first_name }} {{ order.customer.last_name }}</div>
+                    <div class="text-xs text-slate-400">{{ order.customer.phone_number }}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                        {{ order.get_source_display }}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium
+                        {% if order.status == 'submitted' %}bg-emerald-50 text-emerald-700
+                        {% elif order.status == 'pending' %}bg-amber-50 text-amber-700
+                        {% else %}bg-slate-100 text-slate-600{% endif %}">
+                        {{ order.status|capfirst }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-slate-500 font-mono text-xs">{{ order.pos_order_id|default:"—" }}</td>
+                <td class="px-6 py-4 text-slate-400">{{ order.created_at|date:"M j, Y g:i A" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
+    <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/>
+        </svg>
+    </div>
+    <p class="text-sm font-semibold text-slate-600">No orders yet</p>
+    <p class="text-sm text-slate-400 mt-1">Orders will appear here once created from a customer search.</p>
+</div>
+{% endif %}
+
+{% endblock %}

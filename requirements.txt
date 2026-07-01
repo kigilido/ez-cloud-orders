@@ -1,0 +1,9 @@
+Django>=5.0,<6.0
+psycopg[binary]>=3.1
+celery[redis]>=5.3
+redis>=5.0
+django-environ>=0.11
+dj-database-url>=2.1
+gunicorn>=22.0
+whitenoise>=6.6
+weasyprint>=63.0
